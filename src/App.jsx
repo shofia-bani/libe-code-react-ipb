@@ -4,7 +4,7 @@ import './App.css'
 
 const DUMMY_TODO = [
   {
-    id: nanoid,
+    id: nanoid(),
     title: 'Belajar React',
     isCompleted: false
   }
@@ -12,23 +12,30 @@ const DUMMY_TODO = [
 
 function App() {
   const [todos, setTodos] = useState(DUMMY_TODO)
-  const [newTodo, setNewtodo] = useState('')
+  const [newTodo, setNewTodo] = useState("")
+  const [error, setError] = useState('')
 
   function addNewTodo(){
-    const updatedTodos = [...todos]
-    const objTodo = {
-      id: nanoid(),
-      title: newTodo,
-      isCompleted: false
+    if (newTodo.length === 0){
+      setError('Todo tidak boleh kosong')
+    } 
+      else {
+      const updatedTodos = [...todos]
+      const objTodo = {
+        id: nanoid(),
+               title: newTodo,
+        isCompleted: false
+      }
+
+      updatedTodos.push(objTodo)
+      setTodos(updatedTodos)
+      setNewTodo('')
     }
-    updatedTodos.push(objTodo)
-    setTodos(updatedTodos)
-    setNewtodo('')
   }
 
-  function complatedTodo(targetTodoId) {
+  function completeTodo(targetTodoId){
     const updatedTodos = todos.map(todo => {
-      if (todo.id === targetTodoId) {
+      if (todo.id === targetTodoId){
         todo.isCompleted = !todo.isCompleted
       }
 
@@ -38,27 +45,39 @@ function App() {
     setTodos(updatedTodos)
   }
 
+  function handleChange(event){
+    setNewTodo(event.target.value)
+    setError('')
+  }
+
   return (
     <>
       <h1> To Do App </h1>
-      <input type="text" 
-      placeholder='Isi to do disini' 
-      value={newTodo} 
-      onChange={event => 
-      setNewtodo(event.target.value)}
+      <input 
+        type="text" 
+        placeholder='Isi to do disini' 
+        value={newTodo} 
+        onChange={event => handleChange(event)}
       /> 
-      <button onClick={() => addNewTodo()} > Create </button>
+      <button onClick={() => addNewTodo()}> Create </button>
+      {
+        error.length > 0 ? (
+          <p style={{color: 'red'}}> {error} </p>
+        ) : null
+      }
       <ul>
         {
-        todos.map((todo) => (
-          <li key={todo.id} 
-          className='todo-item'
-           style={{
-            textDecoration: todo.isCompleted ? 'line-through' : 'none'
-            }}
-            > 
-          <input type='checkbox' onChange={() => completedTodo(todo.id)}/>
-          {todo.title} </li>
+        todos.map(todo => (
+          <li 
+            key={todo.id} 
+            className='todo-item' 
+            style={{
+              textDecoration: todo.isCompleted ? 'line-through' : 'none',
+              }}
+              > 
+            <input type='checkbox' onChange={() => completeTodo(todo.id)}/>
+            {todo.title} 
+          </li>
         ))
         }
       </ul>
